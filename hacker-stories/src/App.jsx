@@ -4,6 +4,8 @@ import { List } from './List';
 import { getAsyncStories } from './GetAsyncStories';
 import { useStorageState } from './UseStorageState';
 
+const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
+
 const App = () => {
   const storiesReducer = (state, action) => {
     switch (action.type) {
@@ -45,11 +47,12 @@ const App = () => {
     React.useEffect(() => {;
       dispatchStories({ type: 'STORIES_FETCH_INIT' });
   
-      getAsyncStories()
+      fetch(`${API_ENDPOINT}react`)
+        .then(response => response.json())
         .then(result => {
           dispatchStories({
             type: 'STORIES_FETCH_SUCCESS',
-            payload: result.data.stories,
+            payload: result.hits,
           });
           setIsLoading(false);
         })
