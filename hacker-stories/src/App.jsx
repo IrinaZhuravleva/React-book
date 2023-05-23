@@ -14,6 +14,20 @@ const App = () => {
     `${API_ENDPOINT}${searchTerm}`
   );
 
+  const handleFetchStories = React.useCallback(async() => {
+    dispatchStories({ type: 'STORIES_FETCH_INIT' });
+    try {
+      const result = await getAsyncStories(url);
+      dispatchStories({
+        type: 'STORIES_FETCH_SUCCESS',
+        payload: result.hits,
+      });
+      } catch {
+        dispatchStories({ type: 'STORIES_FETCH_FAILURE' });
+      }
+      }, [url]);
+
+
   const storiesReducer = (state, action) => {
     switch (action.type) {
       case 'STORIES_FETCH_INIT':
@@ -51,25 +65,25 @@ const App = () => {
     storiesReducer,
     { data: [], isLoading: false, isError: false }
     );
-    const handleFetchStories = React.useCallback(() => {
-    // React.useEffect(() => {;
-      if (!searchTerm) return;
+    // const handleFetchStories = React.useCallback(() => {
+    //   if (!searchTerm) return;
 
-      dispatchStories({ type: 'STORIES_FETCH_INIT' });
+    //   dispatchStories({ type: 'STORIES_FETCH_INIT' });
   
-      fetch(url)
-        .then(response => response.json())
-        .then(result => {
-          dispatchStories({
-            type: 'STORIES_FETCH_SUCCESS',
-            payload: result.hits,
-          });
-          setIsLoading(false);
-        })
-        .catch(() => 
-          dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
-        );
-    }, [url]);
+    //   fetch(url)
+    //     .then(response => response.json())
+    //     .then(result => {
+    //       dispatchStories({
+    //         type: 'STORIES_FETCH_SUCCESS',
+    //         payload: result.hits,
+    //       });
+    //       setIsLoading(false);
+    //     })
+    //     .catch(() => 
+    //       dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
+    //     );
+    // }, [url]);
+
     React.useEffect(() => {
       handleFetchStories();
     }, [handleFetchStories]);
@@ -126,4 +140,5 @@ const App = () => {
 };
 
 export default App;
+
 
