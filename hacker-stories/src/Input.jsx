@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export const InputWithLable = ({ 
+export const InputWithLabel = ({ 
     id, 
     value, 
     type = 'text', 
@@ -33,4 +33,4 @@ export const InputWithLable = ({
       )
     };
 
-export default InputWithLable;
+export default InputWithLabel;
