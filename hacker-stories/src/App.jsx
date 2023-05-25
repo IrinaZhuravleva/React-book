@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { InputWithLable } from './Input';
+import { InputWithLabel } from './Input';
 import { List } from './List';
 import { getAsyncStories } from './GetAsyncStories';
 import { useStorageState } from './UseStorageState';
+import axios from 'axios';
 
 const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
 
@@ -14,18 +15,13 @@ const App = () => {
     `${API_ENDPOINT}${searchTerm}`
   );
 
-  const handleFetchStories = React.useCallback(async() => {
-    dispatchStories({ type: 'STORIES_FETCH_INIT' });
-    try {
-      const result = await getAsyncStories(url);
-      dispatchStories({
-        type: 'STORIES_FETCH_SUCCESS',
-        payload: result.hits,
-      });
-      } catch {
-        dispatchStories({ type: 'STORIES_FETCH_FAILURE' });
-      }
-      }, [url]);
+  const handleSearchInput = (event) => {
+    setSearchTerm(event.target.value); // то, что мы вбиваем в инпут поиска
+  };
+
+  const handleSearchSubmit = () => {
+    setUrl(`${API_ENDPOINT}${searchTerm}`);
+  };
 
 
   const storiesReducer = (state, action) => {
@@ -64,12 +60,22 @@ const App = () => {
   const [stories, dispatchStories] = React.useReducer(
     storiesReducer,
     { data: [], isLoading: false, isError: false }
-    );
-    // const handleFetchStories = React.useCallback(() => {
-    //   if (!searchTerm) return;
+  );
 
+  const handleFetchStories = React.useCallback(async() => {
+    dispatchStories({ type: 'STORIES_FETCH_INIT' });
+    try {
+      const result = await axios.get(url);
+      dispatchStories({
+        type: 'STORIES_FETCH_SUCCESS',
+        payload: result.data.hits,
+      });
+    } catch {
+      dispatchStories({ type: 'STORIES_FETCH_FAILURE' });
+    }
+  }, [url]);
+    // const handleFetchStories = React.useCallback(() => {
     //   dispatchStories({ type: 'STORIES_FETCH_INIT' });
-  
     //   fetch(url)
     //     .then(response => response.json())
     //     .then(result => {
@@ -77,8 +83,7 @@ const App = () => {
     //         type: 'STORIES_FETCH_SUCCESS',
     //         payload: result.hits,
     //       });
-    //       setIsLoading(false);
-    //     })
+    //     })    
     //     .catch(() => 
     //       dispatchStories({ type: 'STORIES_FETCH_FAILURE' })
     //     );
@@ -99,29 +104,22 @@ const App = () => {
   //   setSearchTerm(event.target.value); // то, что мы вбиваем в инпут поиска
   // };
 
-  const handleSearchInput = (event) => {
-    setSearchTerm(event.target.value); // то, что мы вбиваем в инпут поиска
-  };
-
-  const handleSearchSubmit = () => {
-    setUrl(`${API_ENDPOINT}${searchTerm}`);
-  };
-
+ 
   return (
     <div>
       <h1>My stories</h1>
-      <InputWithLable
+      <InputWithLabel
         id="search"
         value={searchTerm}
         isFocused
         onInputChange={handleSearchInput}
       ><strong>Search:</strong>
-        </InputWithLable>
+        </InputWithLabel>
 
         <button
           type="button"
           disabled={!searchTerm} // если нет searchTerm, то кнопка disabled
-          onClick={handleFetchStories}
+          onClick={handleSearchSubmit}
           >
             Submit
         </button>
