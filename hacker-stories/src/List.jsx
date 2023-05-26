@@ -1,6 +1,6 @@
 import {Item} from './Item';
 
-export const List = ({list, onRemoveItem}) => (
+export const List = ({list, onRemoveItem}) => ( // именованный экспорт
     <ul>
       {list.map((item) => (
         <Item 
